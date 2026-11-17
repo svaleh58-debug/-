@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3D STUDIO PRO</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#171b22;color:#e8eef7;font:13px Tahoma,Arial,sans-serif;overflow:hidden}
+button,input{font:inherit}button{cursor:pointer;color:#edf6ff;background:#293545;border:1px solid #40536a;border-radius:6px;padding:8px}button:active,button:hover{background:#075b9d;border-color:#43adff}
+.top{height:52px;background:#202833;border-bottom:1px solid #394657;display:flex;align-items:center;justify-content:space-between;padding:0 10px;gap:8px}.brand{font-weight:bold;color:#69c3ff;white-space:nowrap}.actions{display:flex;gap:5px;flex-wrap:wrap}.actions button{font-size:11px;padding:7px}
+.menu{height:36px;background:#29313d;display:flex;align-items:center;gap:5px;padding:0 8px;overflow:auto}.menu button{font-size:11px;padding:5px 9px}
+.layout{height:calc(100dvh - 110px);display:grid;grid-template-columns:205px minmax(180px,1fr) 210px;direction:ltr;min-height:0}
+.panel{background:#222a35;padding:9px;overflow:auto;direction:rtl;border-color:#101722}.left{border-right:1px solid #101722}.right{border-left:1px solid #101722}
+.heading{color:#7dcaff;font-weight:bold;border-bottom:1px solid #3c4858;padding:5px 0 9px;margin-bottom:9px}
+.tabs{display:flex;gap:4px;margin-bottom:9px}.tabs button{flex:1;font-size:11px;padding:7px 2px}.tabs .on{background:#075b9d}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.item{height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;background:#2b3542}.item b{font-size:20px;color:#69c3ff}
+.box{background:#2a3340;border:1px solid #3d4a5b;border-radius:7px;padding:9px;margin:10px 0}.box label{display:block;color:#b9c8d9;font-size:11px;margin:8px 0 4px}input[type=color],input[type=range],input[type=text]{width:100%}input[type=text]{background:#151d28;color:white;border:1px solid #45566b;border-radius:5px;padding:8px}input[type=color]{height:34px}input[type=range]{accent-color:#168ff0}
+.center{position:relative;min-width:0;min-height:0;background:#101722}#view{display:block;width:100%;height:100%;touch-action:none}
+.tools{position:absolute;top:8px;left:8px;display:flex;gap:4px;flex-wrap:wrap;z-index:2}.tools button{font-size:10px;padding:7px;background:#202c3beF}.tools .on{background:#075b9d}
+.timeline{position:absolute;bottom:0;left:0;right:0;height:48px;background:#202a36dd;border-top:1px solid #405064;display:flex;align-items:center;gap:8px;padding:6px 10px;z-index:2}.timeline strong{font-size:10px;color:#82ceff;white-space:nowrap}.timeline input{flex:1;min-width:40px}.clock{direction:ltr;font-size:11px;min-width:40px}
+.status{height:22px;background:#0868a8;display:flex;justify-content:space-between;align-items:center;padding:0 9px;font-size:10px}
+.wide{width:100%;margin-top:6px}.small{font-size:10px;color:#a9bbce;line-height:1.8}.error{position:absolute;inset:55px 12px auto;background:#5b2029;color:#fff;padding:10px;border-radius:7px;z-index:10;display:none}
+@media(max-width:760px){.layout{grid-template-columns:130px minmax(140px,1fr) 135px}.panel{padding:5px}.item{height:55px;font-size:10px}.top{height:auto;min-height:52px;flex-wrap:wrap;padding:6px}.brand{font-size:12px}.actions button{font-size:9px}.menu{height:32px}.layout{height:calc(100dvh - 106px)}}
+@media(max-width:480px){.layout{grid-template-columns:100px minmax(125px,1fr) 112px}.grid{grid-template-columns:1fr}.item{height:48px}.tools button{font-size:9px;padding:5px}.timeline{gap:4px;padding:5px}.timeline strong{font-size:9px}}
+</style>
+</head>
+<body>
+<header class="top">
+ <div class="brand">◆ 3D STUDIO PRO <small style="color:#a3b4c8;font-weight:normal">| ARCHITECTURE</small></div>
+ <div class="actions">
+  <button onclick="newScene()">پروژه جدید</button><button onclick="saveProject()">ذخیره پروژه</button><button onclick="document.getElementById('openFile').click()">بازکردن</button><button onclick="exportPNG()">خروجی تصویر</button>
+ </div>
+</header>
+<nav class="menu"><button onclick="newScene()">فایل</button><button onclick="resetView()">نمای اولیه</button><button onclick="switchTab('architecture')">معماری</button><button onclick="switchTab('interior')">داخلی</button><button onclick="switchTab('basic')">اشکال سه‌بعدی</button></nav>
+<div class="layout">
+ <aside class="panel left">
+  <div class="tabs"><button id="tArch" class="on" onclick="switchTab('architecture')">معماری</button><button id="tInt" onclick="switchTab('interior')">داخلی</button><button id="tBasic" onclick="switchTab('basic')">اشکال</button></div>
+  <div id="library" class="grid"></div>
+  <div class="heading" style="margin-top:15px">تنظیمات ایجاد</div>
+  <div class="box"><label>رنگ شیء جدید</label><input id="newColor" type="color" value="#70a9d8"><label>اندازه</label><input id="newSize" type="range" min=".3" max="3" step=".1" value="1"><div id="sizeText" class="small">اندازه: 1.0</div></div>
+  <button class="wide" onclick="toggleGrid()">شبکه روشن / خاموش</button>
+  <button class="wide" onclick="resetView()">بازنشانی دوربین</button>
+ </aside>
+ <main class="center">
+  <div class="tools"><button id="moveBtn" class="on" onclick="setTool('translate')">✥ حرکت</button><button id="rotBtn" onclick="setTool('rotate')">⟳ چرخش</button><button id="scaleBtn" onclick="setTool('scale')">⤢ اندازه</button><button onclick="deleteSelected()">حذف</button></div>
+  <canvas id="view"></canvas>
+  <div id="error" class="error"></div>
+  <div class="timeline"><strong>زمان نور</strong><span class="small">۶</span><input id="day" type="range" min="6" max="20" step=".25" value="14"><span class="small">۲۰</span><span id="clock" class="clock">14:00</span></div>
+ </main>
+ <aside class="panel right">
+  <div class="heading">ویژگی‌های شیء</div>
+  <div class="box"><label>نام</label><input id="objName" type="text" placeholder="شیئی انتخاب نشده"><label>رنگ</label><input id="objColor" type="color" value="#70a9d8">
+   <label>مقیاس X</label><input id="sx" type="range" min=".1" max="6" step=".1" value="1">
+   <label>مقیاس Y</label><input id="sy" type="range" min=".1" max="6" step=".1" value="1">
+   <label>مقیاس Z</label><input id="sz" type="range" min=".1" max="6" step=".1" value="1">
+   <button class="wide" onclick="applyProperties()">اعمال تغییرات</button>
+  </div>
+  <div class="heading">اطلاعات صحنه</div><div class="box small">تعداد اشیاء: <b id="count" style="color:#72caff">0</b><div id="info">هنوز شیئی ساخته نشده است.</div></div>
+  <div class="heading">نورپردازی</div><div class="box"><button class="wide" onclick="setTime(8)">صبح</button><button class="wide" onclick="setTime(12)">ظهر</button><button class="wide" onclick="setTime(18)">غروب</button></div>
+ </aside>
+</div>
+<footer class="status"><span id="status">در حال آماده‌سازی محیط سه‌بعدی...</span><span>کلیک برای انتخاب · کشیدن برای چرخش نما</span><span id="objectsCount">0 OBJECTS</span></footer>
+<input id="openFile" type="file" accept=".json" hidden>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.128.0/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+let scene,camera,renderer,orbit,transform,sun,grid,objects=[],selected=null,raycaster,mouse,gridVisible=true,ready=false;
+const catalogs={
+ architecture:[['wall','▰','دیوار'],['door','▯','در'],['window','▣','پنجره'],['house','⌂','خانه'],['roof','⌃','سقف'],['floor','▱','کف'],['stairs','▤','پله']],
+ interior:[['bed','▰','تخت'],['sofa','▰','مبل'],['table','▱','میز'],['chair','♧','صندلی'],['cabinet','▥','کابینت'],['fridge','▯','یخچال'],['toilet','◒','توالت'],['sink','◡','روشویی'],['bathtub','▱','وان']],
+ basic:[['box','▣','مکعب'],['sphere','◉','کره'],['cone','△','مخروط'],['cylinder','▤','استوانه'],['torus','◎','حلقه'],['tetra','◇','چهاروجهی'],['octa','⬙','هشت‌وجهی'],['dodeca','⬡','دوازده‌وجهی'],['icosa','⬢','بیست‌وجهی'],['knot','∞','گره']]
+};
+function fail(msg){$('error').style.display='block';$('error').textContent=msg;$('status').textContent='خطا در راه‌اندازی';}
+function init(){
+ if(!window.THREE){fail('کتابخانه سه‌بعدی بارگذاری نشد. اتصال اینترنت را بررسی کنید و فایل را دوباره باز کنید.');return;}
+ try{
+  const canvas=$('view');scene=new THREE.Scene();scene.background=new THREE.Color(0x172536);
+  camera=new THREE.PerspectiveCamera(48,1,.1,1000);camera.position.set(10,8,12);
+  renderer=new THREE.WebGLRenderer({canvas,antialias:true,preserveDrawingBuffer:true});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  orbit=new THREE.OrbitControls(camera,canvas);orbit.enableDamping=true;orbit.target.set(0,1,0);
+  scene.add(new THREE.HemisphereLight(0xc8e2ff,0x34313a,1.35));
+  sun=new THREE.DirectionalLight(0xffe0b3,2.4);sun.position.set(8,14,6);sun.castShadow=true;scene.add(sun);
+  grid=new THREE.GridHelper(100,100,0x3185c2,0x35475c);scene.add(grid);
+  const ground=new THREE.Mesh(new THREE.PlaneGeometry(300,300),new THREE.MeshStandardMaterial({color:0x303945,roughness:1}));ground.rotation.x=-Math.PI/2;ground.position.y=-.06;ground.receiveShadow=true;scene.add(ground);
+  transform=new THREE.TransformControls(camera,canvas);scene.add(transform);transform.addEventListener('dragging-changed',e=>orbit.enabled=!e.value);transform.addEventListener('change',render);
+  raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();
+  window.addEventListener('resize',resize);resize();
+  canvas.addEventListener('pointerdown',pick);
+  ready=true;$('status').textContent='محیط سه‌بعدی آماده است؛ برای ساخت، روی یکی از شکل‌ها بزنید.';
+  animate();
+ }catch(e){fail('خطای راه‌اندازی گرافیک: '+e.message+' — اگر دستگاه از WebGL پشتیبانی نمی‌کند، با مرورگر دیگری امتحان کنید.');}
+}
+function resize(){if(!renderer)return;const w=$('view').clientWidth,h=$('view').clientHeight;if(!w||!h)return;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false);render();}
+function material(color){return new THREE.MeshStandardMaterial({color:color,roughness:.68,metalness:.04});}
+function addMesh(group,geometry,color,x,y,z){const m=new THREE.Mesh(geometry,material(color));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;group.add(m);return m;}
+function addBox(group,color,x,y,z,w,h,d){return addMesh(group,new THREE.BoxGeometry(w,h,d),color,x,y,z);}
+function create(type){
+ if(!ready){$('status').textContent='محیط هنوز آماده نیست؛ چند لحظه صبر کنید.';return;}
+ const c=$('newColor').value,g=new THREE.Group();g.name=type+'_'+(objects.length+1);
+ const wall=(x,y,z,w,h,d)=>addBox(g,c,x,y,z,w,h,d);
+ switch(type){
+ case'wall':wall(0,1.5,0,5,3,.22);break;
+ case'door':wall(0,1.5,0,2.3,3,.2);addBox(g,0x79543b,0,1.15,.14,1.05,2.3,.16);addMesh(g,new THREE.SphereGeometry(.07,16,12),0xe6c46a,.4,1.2,.25);break;
+ case'window':wall(0,1.5,0,2.8,2.2,.18);addBox(g,0x63bce8,0,1.5,.12,2.5,1.9,.08).material.transparent=true;g.children[g.children.length-1].material.opacity=.6;addBox(g,0xe3eaf1,0,1.5,.2,2.8,.1,.12);addBox(g,0xe3eaf1,0,1.5,.2,.1,2.2,.12);break;
+ case'house':wall(0,1.5,0,5,3,4.5);let roof=addMesh(g,new THREE.ConeGeometry(3.8,2,4),0x315f91,0,4,0);roof.rotation.y=Math.PI/4;addBox(g,0x79543b,0,1.05,2.28,1.1,2.1,.2);break;
+ case'roof':let r=addMesh(g,new THREE.ConeGeometry(3.5,1.8,4),c,0,3.8,0);r.rotation.y=Math.PI/4;break;
+ case'floor':wall(0,.08,0,6,.16,6);break;
+ case'stairs':for(let i=0;i<6;i++)addBox(g,c,0,.12+i*.22,-1.4+i*.55,2,.25+i*.22,.55);break;
+ case'bed':wall(0,.55,0,2.2,.35,3);addBox(g,0xe2e9f1,0,.82,-.25,2.25,.18,2.3);wall(0,1.05,-1.42,2.3,1,.18);break;
+ case'sofa':wall(0,.55,0,2.6,.55,1);wall(0,1.05,-.48,2.6,.65,.22);wall(-1.2,.85,0,.22,.8,1);wall(1.2,.85,0,.22,.8,1);break;
+ case'table':wall(0,1,0,2.2,.18,1.5);for(let x of [-.9,.9])for(let z of [-.55,.55])wall(x,.48,z,.13,.9,.13);break;
+ case'chair':wall(0,.75,0,1,.15,1);wall(0,1.35,-.43,1,1,.14);for(let x of [-.4,.4])for(let z of [-.38,.38])wall(x,.35,z,.1,.7,.1);break;
+ case'cabinet':wall(0,1,0,1.8,2,.7);for(let x of [-.43,.43])addBox(g,0x202a36,x,1,.37,.035,1.8,.04);break;
+ case'fridge':wall(0,1.25,0,1.1,2.5,.9);addBox(g,0x9aabba,.42,1.8,.48,.04,1.1,.05);break;
+ case'toilet':addMesh(g,new THREE.CylinderGeometry(.5,.55,.45,32),0xe7edf4,0,.35,0);addBox(g,0xe7edf4,0,.9,-.48,.8,.85,.25);break;
+ case'sink':wall(0,.9,0,1.4,.18,.8);addMesh(g,new THREE.SphereGeometry(.48,24,16,0,Math.PI*2,0,Math.PI/2),0xdce7ef,0,1,0);break;
+ case'bathtub':addBox(g,0xe6edf4,0,.4,0,2.4,.65,1.2);addBox(g,0x78b9d8,0,.72,0,2.05,.18,.88);break;
+ case'box':addMesh(g,new THREE.BoxGeometry(2,2,2),c,0,1,0);break;
+ case'sphere':addMesh(g,new THREE.SphereGeometry(1.2,32,24),c,0,1.2,0);break;
+ case'cone':addMesh(g,new THREE.ConeGeometry(1.2,2.5,32),c,0,1.25,0);break;
+ case'cylinder':addMesh(g,new THREE.CylinderGeometry(1,1,2.5,32),c,0,1.25,0);break;
+ case'torus':addMesh(g,new THREE.TorusGeometry(1.1,.3,16,48),c,0,1.2,0);break;
+ case'tetra':addMesh(g,new THREE.TetrahedronGeometry(1.5),c,0,1.5,0);break;
+ case'octa':addMesh(g,new THREE.OctahedronGeometry(1.5),c,0,1.5,0);break;
+ case'dodeca':addMesh(g,new THREE.DodecahedronGeometry(1.5),c,0,1.5,0);break;
+ case'icosa':addMesh(g,new THREE.IcosahedronGeometry(1.5),c,0,1.5,0);break;
+ case'knot':addMesh(g,new THREE.TorusKnotGeometry(1,.3,80,12),c,0,1.5,0);break;
+ }
+ const size=Number($('newSize').value);g.scale.setScalar(size);
+ const n=objects.length;g.position.set((n%4)*2.2-3.3,0,Math.floor(n/4)*2.2);
+ scene.add(g);objects.push(g);select(g);updateCount();$('status').textContent='شیء «'+g.name+'» با موفقیت ایجاد شد.';render();
+}
+function switchTab(tab){['tArch','tInt','tBasic'].forEach(id=>$(id).classList.remove('on'));$(({architecture:'tArch',interior:'tInt',basic:'tBasic'})[tab]).classList.add('on');$('library').innerHTML='';catalogs[tab].forEach(([type,icon,label])=>{let b=document.createElement('button');b.className='item';b.innerHTML='<b>'+icon+'</b>'+label;b.addEventListener('click',()=>create(type));$('library').appendChild(b);});}
+function select(o){selected=o;transform.attach(o);$('objName').value=o.name;syncProps();$('info').textContent='انتخاب: '+o.name;}
+function syncProps(){if(!selected)return;$('sx').value=selected.scale.x;$('sy').value=selected.scale.y;$('sz').value=selected.scale.z;let m=selected.children.find(x=>x.isMesh);if(m)$('objColor').value='#'+m.material.color.getHexString();}
+function pick(e){if(!ready||transform.dragging)return;const rect=$('view').getBoundingClientRect();mouse.x=((e.clientX-rect.left)/rect.width)*2-1;mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;raycaster.setFromCamera(mouse,camera);const hits=raycaster.intersectObjects(objects,true);if(hits.length){let root=hits[0].object;while(root.parent&&!objects.includes(root))root=root.parent;if(objects.includes(root))select(root);}else{transform.detach();selected=null;$('objName').value='';$('info').textContent='انتخابی وجود ندارد.';}}
+function updateCount(){$('count').textContent=objects.length;$('objectsCount').textContent=objects.length+' OBJECTS';}
+window.switchTab=switchTab;
+window.setTool=m=>{if(!transform)return;transform.setMode(m);['moveBtn','rotBtn','scaleBtn'].forEach(id=>$(id).classList.remove('on'));$(({translate:'moveBtn',rotate:'rotBtn',scale:'scaleBtn'})[m]).classList.add('on');};
+window.applyProperties=()=>{if(!selected)return;selected.name=$('objName').value||'Object';selected.scale.set(+$('sx').value,+$('sy').value,+$('sz').value);let col=$('objColor').value;selected.traverse(o=>{if(o.isMesh)o.material.color.set(col)});$('info').textContent='انتخاب: '+selected.name;render();};
+window.deleteSelected=()=>{if(!selected)return;scene.remove(selected);selected.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});objects=objects.filter(o=>o!==selected);transform.detach();selected=null;$('objName').value='';$('info').textContent='انتخابی وجود ندارد.';updateCount();render();};
+window.newScene=()=>{if(objects.length&&!confirm('همه اشیای صحنه پاک شوند؟'))return;objects.forEach(o=>scene.remove(o));objects=[];selected=null;transform.detach();$('objName').value='';$('info').textContent='صحنه خالی است.';updateCount();render();};
+window.toggleGrid=()=>{gridVisible=!gridVisible;grid.visible=gridVisible;render();};
+window.resetView=()=>{camera.position.set(10,8,12);orbit.target.set(0,1,0);orbit.update();render();};
+window.setTime=h=>{$('day').value=h;updateSun();};
+function updateSun(){if(!sun)return;let h=+$('day').value,a=(h-6)/14*Math.PI;sun.position.set(Math.cos(a)*18,Math.sin(a)*20+1,7);sun.intensity=.25+2.6*Math.max(0,Math.sin(a));sun.color.set(h<8||h>17?0xffb36b:0xffedcf);scene.background.set(h<7||h>18?0x101827:0x172536);$('clock').textContent=String(Math.floor(h)).padStart(2,'0')+':'+String(Math.round(h%1*60)).padStart(2,'0');render();}
+$('day').addEventListener('input',updateSun);$('newSize').addEventListener('input',e=>$('sizeText').textContent='اندازه: '+Number(e.target.value).toFixed(1));
+window.saveProject=()=>{const data={app:'3D STUDIO PRO',objects:objects.map(o=>o.toJSON())};const blob=new Blob([JSON.stringify(data)],{type:'application/json'});download(blob,'3D-STUDIO-PRO.json');};
+function download(blob,name){let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);}
+window.exportPNG=()=>{if(!renderer)return;render();renderer.domElement.toBlob(b=>download(b,'3D-STUDIO-PRO.png'));};
+$('openFile').addEventListener('change',async e=>{let f=e.target.files[0];if(!f)return;try{let data=JSON.parse(await f.text());if(data.app!=='3D STUDIO PRO'||!Array.isArray(data.objects))throw Error('فایل پروژه معتبر نیست');objects.forEach(o=>scene.remove(o));objects=[];let loader=new THREE.ObjectLoader();data.objects.forEach(raw=>{let o=loader.parse(raw);scene.add(o);objects.push(o);});selected=null;transform.detach();updateCount();render();$('status').textContent='پروژه با موفقیت باز شد.';}catch(err){alert('خطا در بازکردن پروژه: '+err.message);}e.target.value='';});
+function render(){if(renderer&&scene&&camera)renderer.render(scene,camera);}
+function animate(){requestAnimationFrame(animate);if(orbit)orbit.update();render();}
+switchTab('architecture');init();
+})();
+</script>
+</body>
+</html>
